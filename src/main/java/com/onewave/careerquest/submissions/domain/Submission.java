@@ -39,10 +39,6 @@ public class Submission {
     private LocalDateTime submittedAt;
 
     @Setter
-    @Column(name = "updated_at")
-    private LocalDateTime updatedAt;
-
-    @Setter
     @Column(name = "is_adopted")
     private Boolean isAdopted = false;
 
@@ -62,5 +58,4 @@ public class Submission {
         this.submittedAt = submittedAt;
         this.isAdopted = false;
     }
-
 }

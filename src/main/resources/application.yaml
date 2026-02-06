@@ -29,7 +29,3 @@ logging:
 springdoc:
   swagger-ui:
     path: /api-test
-
-custom:
-  jwt:
-    secretKey: ${JWT_SECRET}

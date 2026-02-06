@@ -1,13 +1,13 @@
 package com.onewave.careerquest.scenarios.controller;
 
 import com.onewave.careerquest.accounts.domain.Account;
+import com.onewave.careerquest.accounts.repository.AccountRepository;
 import com.onewave.careerquest.scenarios.dto.ScenarioCreateRequestDto;
 import com.onewave.careerquest.scenarios.dto.ScenarioResponseDto;
 import com.onewave.careerquest.scenarios.service.ScenarioService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -18,9 +18,13 @@ import java.util.List;
 public class ScenarioController {
 
     private final ScenarioService scenarioService;
+    private final AccountRepository accountRepository;
 
     @PostMapping
-    public ResponseEntity<ScenarioResponseDto> createScenario(@RequestBody ScenarioCreateRequestDto requestDto, @AuthenticationPrincipal Account currentUser) {
+    public ResponseEntity<ScenarioResponseDto> createScenario(
+            @RequestBody ScenarioCreateRequestDto requestDto,
+            @RequestParam(required = false, defaultValue = "1") Long userId) {
+        Account currentUser = accountRepository.findById(userId).orElse(null);
         ScenarioResponseDto responseDto = scenarioService.createScenario(requestDto, currentUser);
         return new ResponseEntity<>(responseDto, HttpStatus.CREATED);
     }

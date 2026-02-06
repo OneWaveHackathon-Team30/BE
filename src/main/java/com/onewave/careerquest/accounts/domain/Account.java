@@ -12,6 +12,7 @@ import lombok.Setter;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 
 @Getter
@@ -60,7 +61,6 @@ public class Account {
 
     protected Account() {}
 
-    // 생성자 / getter / setter (간결하게 필요할 경우 확장)
     public Account(String email, String uid, String nickname, String passwordHash, Role role, LocalDateTime createdAt) {
         this.email = email;
         this.uid = uid;
@@ -69,5 +69,4 @@ public class Account {
         this.role = role;
         this.createdAt = createdAt;
     }
-
 }

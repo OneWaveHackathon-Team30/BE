@@ -6,6 +6,7 @@ import com.onewave.careerquest.submissions.domain.Submission;
 import com.onewave.careerquest.comments.domain.Comment;
 
 import jakarta.persistence.*;
+import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -26,7 +27,7 @@ public class Account {
     private String email;
 
     @Setter
-    private Long uid;
+    private String uid;
 
     @Setter
     @Column(columnDefinition = "text")
@@ -60,7 +61,7 @@ public class Account {
     protected Account() {}
 
     // 생성자 / getter / setter (간결하게 필요할 경우 확장)
-    public Account(String email, Long uid, String nickname, String passwordHash, Role role, LocalDateTime createdAt) {
+    public Account(String email, String uid, String nickname, String passwordHash, Role role, LocalDateTime createdAt) {
         this.email = email;
         this.uid = uid;
         this.nickname = nickname;

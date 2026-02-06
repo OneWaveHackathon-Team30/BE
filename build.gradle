@@ -1,3 +1,5 @@
+
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.0.2'
@@ -27,8 +29,10 @@ repositories {
 dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-web'
-	implementation 'org.springframework.boot:spring-boot-starter-web-services'
+	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.2.0'
+
+	implementation 'org.springframework.boot:spring-boot-starter-web-services'
 	implementation 'com.google.firebase:firebase-admin:9.2.0'
 
 	// jwt
@@ -40,10 +44,10 @@ dependencies {
 	
 	// PostgreSQL
 	runtimeOnly 'org.postgresql:postgresql'
-	
+
 	// H2 for testing
 	runtimeOnly 'com.h2database:h2'
-	
+
 	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 	testImplementation 'org.springframework.boot:spring-boot-starter-data-jpa-test'
@@ -54,3 +58,4 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+

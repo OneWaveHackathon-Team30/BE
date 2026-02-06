@@ -1,3 +1,7 @@
 spring:
   application:
     name: careerquest
+
+springdoc:
+  swagger-ui:
+    path: /api-test

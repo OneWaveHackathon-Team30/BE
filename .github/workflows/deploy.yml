@@ -1,18 +1,9 @@
-name: Deploy to Cloud Run
+name: Deploy to Cloud Run (Image)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
   workflow_dispatch:
-    inputs:
-      environment:
-        description: "Deployment target"
-        required: true
-        default: "prod"
-        type: choice
-        options:
-          - prod
-          - staging
 
 jobs:
   deploy:
@@ -20,10 +11,14 @@ jobs:
     permissions:
       contents: read
       id-token: write
+
     env:
       PROJECT_ID: careerquest-486610
-      SERVICE: career-quest
       REGION: asia-northeast3
+      SERVICE: career-quest
+      AR_REPO: cloud-run
+      IMAGE_NAME: career-quest
+
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -35,17 +30,46 @@ jobs:
           service_account: ${{ secrets.GCP_SERVICE_ACCOUNT }}
           project_id: ${{ env.PROJECT_ID }}
 
-      - name: Deploy to Cloud Run (from source)
-        id: deploy
-        uses: google-github-actions/deploy-cloudrun@v3
+      - name: Setup gcloud
+        uses: google-github-actions/setup-gcloud@v2
         with:
           project_id: ${{ env.PROJECT_ID }}
-          service: ${{ env.SERVICE }}
-          region: ${{ env.REGION }}
-          source: .
-          flags: --quiet
-          env_vars: |
-            GOOGLE_RUNTIME_VERSION=17
+
+      - name: Configure Docker auth for Artifact Registry
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev --quiet
+
+      - name: Ensure Artifact Registry repo exists
+        run: |
+          set -e
+          if ! gcloud artifacts repositories describe "${AR_REPO}" \
+            --location "${REGION}" --project "${PROJECT_ID}" >/dev/null 2>&1; then
+            gcloud artifacts repositories create "${AR_REPO}" \
+              --repository-format=docker \
+              --location "${REGION}" \
+              --project "${PROJECT_ID}" \
+              --description="Docker images for Cloud Run"
+          fi
+
+      - name: Build & Push image
+        env:
+          IMAGE_URI: ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.AR_REPO }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+        run: |
+          echo "IMAGE_URI=$IMAGE_URI" >> $GITHUB_ENV
+          docker build -t "$IMAGE_URI" .
+          docker push "$IMAGE_URI"
+
+      - name: Deploy to Cloud Run (image)
+        run: |
+          gcloud run deploy "${SERVICE}" \
+            --image "${IMAGE_URI}" \
+            --region "${REGION}" \
+            --project "${PROJECT_ID}" \
+            --quiet
 
       - name: Show URL
-        run: echo "Deployed to ${{ steps.deploy.outputs.url }}"
+        run: |
+          gcloud run services describe "${SERVICE}" \
+            --region "${REGION}" \
+            --project "${PROJECT_ID}" \
+            --format="value(status.url)"

@@ -39,6 +39,10 @@ public class Submission {
     private LocalDateTime submittedAt;
 
     @Setter
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    @Setter
     @Column(name = "is_adopted")
     private Boolean isAdopted = false;
 

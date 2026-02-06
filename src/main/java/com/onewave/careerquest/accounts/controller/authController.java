@@ -27,15 +27,15 @@ public class authController {
         // 헤더에서 "Bearer <idToken>" 형태로 들어온 경우 처리
         String idToken = firebaseIdToken.replace("Bearer ", "");
         System.out.println("idToken = " + idToken);
-
-        AuthTokens tokens = authService.loginOrRegister(idToken, nickname);
-        System.out.println("nickname = " + nickname);
+//
+//        AuthTokens tokens = authService.loginOrRegister(idToken, nickname);
+//        System.out.println("nickname = " + nickname);
 
         // body 구성
         LoginRequestDto body = new LoginRequestDto(200, "로그인 상태 확인 성공");
 
         return ResponseEntity.ok()
-                .header(HttpHeaders.AUTHORIZATION, "Bearer " + tokens.getAccessToken())
+                .header(HttpHeaders.AUTHORIZATION, "Bearer " + idToken)
                 .body(body);
     }
 }

@@ -44,6 +44,8 @@ jobs:
           region: ${{ env.REGION }}
           source: .
           flags: --quiet
+          env_vars: |
+            GOOGLE_RUNTIME_VERSION=17
 
       - name: Show URL
         run: echo "Deployed to ${{ steps.deploy.outputs.url }}"

@@ -5,6 +5,9 @@ spring:
   application:
     name: careerquest
 
+  config:
+    import: optional:classpath:.env.properties
+
   datasource:
     url: jdbc:postgresql://ep-shy-silence-a1mfem0j-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
     username: neondb_owner
@@ -26,3 +29,7 @@ logging:
 springdoc:
   swagger-ui:
     path: /api-test
+
+custom:
+  jwt:
+    secretKey: ${JWT_SECRET}

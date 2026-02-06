@@ -3,6 +3,16 @@ name: Deploy to Cloud Run
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: "Deployment target"
+        required: true
+        default: "prod"
+        type: choice
+        options:
+          - prod
+          - staging
 
 jobs:
   deploy:

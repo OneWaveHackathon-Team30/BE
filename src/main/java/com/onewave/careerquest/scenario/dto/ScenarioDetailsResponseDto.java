@@ -5,23 +5,29 @@ import com.onewave.careerquest.scenario.domain.ScenarioSource;
 import com.onewave.careerquest.scenario.domain.ScenarioStatus;
 import lombok.Builder;
 import lombok.Data;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 public class ScenarioDetailsResponseDto {
-    private String id;
+    private Long id;
+    private Long companyAccountId;
+    private String companyName;
     private String title;
     private String description;
     private String repoUrl;
     private ScenarioSource source;
     private ScenarioStatus status;
-    private Date dueAt;
-    private Date createdAt;
+    private LocalDateTime dueAt;
+    private LocalDateTime createdAt;
+    private LocalDateTime updatedAt;
 
-    public static ScenarioDetailsResponseDto fromEntity(Scenario scenario) {
+    public static ScenarioDetailsResponseDto from(Scenario scenario) {
         return ScenarioDetailsResponseDto.builder()
                 .id(scenario.getId())
+                .companyAccountId(scenario.getCompany() != null ? scenario.getCompany().getId() : null)
+                .companyName(scenario.getCompany() != null ? scenario.getCompany().getNickname() : "GEMINI")
                 .title(scenario.getTitle())
                 .description(scenario.getDescription())
                 .repoUrl(scenario.getRepoUrl())
@@ -29,6 +35,7 @@ public class ScenarioDetailsResponseDto {
                 .status(scenario.getStatus())
                 .dueAt(scenario.getDueAt())
                 .createdAt(scenario.getCreatedAt())
+                .updatedAt(scenario.getUpdatedAt())
                 .build();
     }
 }

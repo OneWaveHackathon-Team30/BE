@@ -5,26 +5,30 @@ import com.onewave.careerquest.scenario.domain.ScenarioSource;
 import com.onewave.careerquest.scenario.domain.ScenarioStatus;
 import lombok.Builder;
 import lombok.Data;
-import java.util.Date;
+
+import java.time.LocalDateTime;
 
 @Data
 @Builder
 public class ScenarioListResponseDto {
-    private String id;
+    private Long id;
     private String title;
+    private String companyName;
     private ScenarioSource source;
     private ScenarioStatus status;
-    private Date dueAt;
-    private long submissionsCount; // ERD에는 없지만 명세에 있는 카운트 필드
+    private LocalDateTime dueAt;
+    private long submissionsCount;
 
-    public static ScenarioListResponseDto fromEntity(Scenario scenario) {
+    public static ScenarioListResponseDto from(Scenario scenario) {
+        // TODO: submissionsCount는 추후 Submission 엔티티와 연동하여 실제 개수를 세어야 합니다.
         return ScenarioListResponseDto.builder()
                 .id(scenario.getId())
                 .title(scenario.getTitle())
+                .companyName(scenario.getCompany() != null ? scenario.getCompany().getNickname() : "GEMINI")
                 .source(scenario.getSource())
                 .status(scenario.getStatus())
                 .dueAt(scenario.getDueAt())
-                .submissionsCount(0) // 추후 제출(Submission) 도메인 구현 시 카운트 쿼리 연동 가능
+                .submissionsCount(0) // 현재는 임시값
                 .build();
     }
 }

@@ -1,20 +1,25 @@
 package com.onewave.careerquest.scenario.dto;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import jakarta.validation.constraints.Future;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotNull;
 import lombok.Data;
-import java.util.Date;
+import org.hibernate.validator.constraints.URL;
+
+import java.time.LocalDateTime;
 
 @Data
 public class ScenarioCreateRequestDto {
-    @NotBlank(message = "제목은 필수입니다.")
+    @NotBlank(message = "제목을 입력해주세요.")
     private String title;
 
-    @NotBlank(message = "설명은 필수입니다.")
+    @NotBlank(message = "설명을 입력해주세요.")
     private String description;
 
-    private String repoUrl; // repo_url 매핑
+    @URL(message = "올바른 URL 형식이 아닙니다.")
+    private String repoUrl;
 
-    @NotNull(message = "마감 기한은 필수입니다.")
-    private Date dueAt; // due_at 매핑
+    @Future(message = "마감일은 현재보다 미래여야 합니다.")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    private LocalDateTime dueAt;
 }

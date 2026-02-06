@@ -1,26 +1,17 @@
 package com.onewave.careerquest.config;
 
-import com.google.auth.oauth2.GoogleCredentials;
-import com.google.cloud.firestore.Firestore;
-import com.google.cloud.firestore.FirestoreOptions;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
-import java.io.FileInputStream;
-import java.io.IOException;
 
 @Configuration
-@EnableWebFluxSecurity
-@EnableMethodSecurity // @PreAuthorize 활성화를 위해 필요
+@EnableWebSecurity // WebFlux -> Web으로 변경
+@EnableMethodSecurity
 public class SecurityConfig {
-
-    // JWT 관련 설정은 여기에 추가됩니다. (예: JwtRequestFilter)
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -28,11 +19,11 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
-                .anyRequest().permitAll() // 우선 모든 요청을 허용하고, 각 메소드에서 @PreAuthorize로 제어
-            );
-            // .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
+                .requestMatchers("/h2-console/**").permitAll() // H2 콘솔 접근 허용
+                .anyRequest().permitAll() // 나머지 요청은 우선 모두 허용
+            )
+            .headers(headers -> headers.frameOptions(frameOptions -> frameOptions.sameOrigin())); // H2 콘솔 iframe 렌더링을 위한 설정
 
         return http.build();
     }
-
 }

@@ -13,7 +13,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import reactor.core.publisher.Mono;
 
 import java.util.List;
 
@@ -25,31 +24,28 @@ public class ScenarioController {
     private final ScenarioService scenarioService;
 
     @GetMapping
-    public Mono<ResponseEntity<GlobalResponse<List<ScenarioListResponseDto>>>> getAllScenarios() {
-        return scenarioService.getAllScenarios()
-                .collectList()
-                .map(list -> ResponseEntity.ok(GlobalResponse.success(200, list)));
+    public ResponseEntity<GlobalResponse<List<ScenarioListResponseDto>>> getAllScenarios() {
+        List<ScenarioListResponseDto> scenarios = scenarioService.getAllScenarios();
+        return ResponseEntity.ok(GlobalResponse.success(200, scenarios));
     }
 
     @GetMapping("/{scenarioId}")
-    public Mono<ResponseEntity<GlobalResponse<ScenarioDetailsResponseDto>>> getScenarioById(
-            @PathVariable String scenarioId) {
-        return scenarioService.getScenarioById(scenarioId)
-                .map(dto -> ResponseEntity.ok(GlobalResponse.success(200, dto)));
+    public ResponseEntity<GlobalResponse<ScenarioDetailsResponseDto>> getScenarioById(
+            @PathVariable Long scenarioId) {
+        ScenarioDetailsResponseDto scenario = scenarioService.getScenarioById(scenarioId);
+        return ResponseEntity.ok(GlobalResponse.success(200, scenario));
     }
 
     @PostMapping
     @PreAuthorize("hasRole('COMPANY')")
-    public Mono<ResponseEntity<GlobalResponse<String>>> createScenario(
+    public ResponseEntity<GlobalResponse<?>> createScenario(
             @Valid @RequestBody ScenarioCreateRequestDto requestDto,
             @AuthenticationPrincipal UserDetails userDetails) {
-
-        // 시나리오 작성자의 ID를 인증 객체에서 추출
-        String companyAccountId = userDetails.getUsername();
-
-        return scenarioService.createScenario(requestDto, companyAccountId)
-                .map(saved -> ResponseEntity
-                        .status(HttpStatus.CREATED)
-                        .body(GlobalResponse.success(201, "시나리오 등록이 완료되었습니다.")));
+        // UserDetails의 username을 회사의 고유 이메일로 사용한다고 가정합니다.
+        String companyUserEmail = userDetails.getUsername();
+        scenarioService.createScenario(requestDto, companyUserEmail);
+        return ResponseEntity
+                .status(HttpStatus.CREATED)
+                .body(GlobalResponse.success(201, "작성이 완료되었습니다."));
     }
 }

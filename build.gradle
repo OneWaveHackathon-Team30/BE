@@ -18,30 +18,24 @@ repositories {
 	mavenCentral()
 }
 
-// Using 'platform' for BOM import directly in the dependencies block
 dependencies {
-	// Import BOMs to manage dependency versions
-	implementation platform("org.springframework.cloud:spring-cloud-dependencies:2023.0.2")
-	implementation platform("com.google.cloud:spring-cloud-gcp-dependencies:5.2.0")
-
-	// Core dependencies for a reactive Firestore application
-	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+	// Standard Web & Data Persistence Stack
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
-	implementation 'com.google.cloud:spring-cloud-gcp-starter-data-firestore'
-	implementation 'io.projectreactor:reactor-core'
 
-	// Lombok for boilerplate code reduction
-	compileOnly 'org.projectlombok:lombok'
+	// H2 In-memory Database
 	runtimeOnly 'com.h2database:h2'
+
+	// Lombok
+	compileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
 
-	// Test dependencies for a reactive stack
+	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'io.projectreactor:reactor-test'
 	testImplementation 'org.springframework.security:spring-security-test'
 }
-
 
 tasks.named('test') {
 	useJUnitPlatform()

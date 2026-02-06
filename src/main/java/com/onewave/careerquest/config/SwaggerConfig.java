@@ -29,7 +29,7 @@ public class SwaggerConfig {
 
         return new OpenAPI()
                 .info(apiInfo())
-                .addServersItem(new Server().url("https://careerquest.run.goorm.app").description("Production Server"))
+                .addServersItem(new Server().url("https://be-393047322674.asia-northeast3.run.app").description("Production Server"))
                 .addServersItem(new Server().url("http://localhost:8080").description("Local Server"))
                 .addSecurityItem(securityRequirement)
                 .components(components);

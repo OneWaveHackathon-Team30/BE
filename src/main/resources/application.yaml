@@ -6,15 +6,10 @@ spring:
     name: careerquest
 
   datasource:
-    url: jdbc:h2:mem:careerquest;MODE=MySQL;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
-    driver-class-name: org.h2.Driver
-    username: sa
-    password:
-
-  h2:
-    console:
-      enabled: true
-      path: /h2-console
+    url: jdbc:postgresql://ep-shy-silence-a1mfem0j-pooler.ap-southeast-1.aws.neon.tech/neondb?sslmode=require&channel_binding=require
+    username: neondb_owner
+    password: npg_PmWaAo5CGg9Y
+    driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
@@ -22,10 +17,12 @@ spring:
     properties:
       hibernate:
         format_sql: true
+    show-sql: true
 
 logging:
   level:
     org.hibernate.SQL: debug
+    
 springdoc:
   swagger-ui:
     path: /api-test

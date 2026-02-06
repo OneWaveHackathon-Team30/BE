@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -14,19 +15,38 @@ public class authService {
 
     private final AccountRepository accountRepository;
 
-    public Long simpleLogin(String email) {
-        Account account = accountRepository.findByEmail(email)
-                .orElseGet(() -> {
-                    Account newAccount = new Account(
-                            email,
-                            "uid_" + email,
-                            email.split("@")[0],
-                            null,
-                            Role.USER,
-                            LocalDateTime.now()
-                    );
-                    return accountRepository.save(newAccount);
-                });
+    public Long register(String email, String password, String nickname) {
+        Optional<Account> existing = accountRepository.findByEmail(email);
+        if (existing.isPresent()) {
+            return existing.get().getId();
+        }
+        
+        String finalNickname = (nickname != null && !nickname.isEmpty()) 
+            ? nickname 
+            : email.split("@")[0];
+        
+        Account newAccount = new Account(
+                email,
+                "uid_" + email,
+                finalNickname,
+                password,
+                Role.USER,
+                LocalDateTime.now()
+        );
+        Account saved = accountRepository.save(newAccount);
+        return saved.getId();
+    }
+    
+    public Long login(String email, String password) {
+        Optional<Account> accountOpt = accountRepository.findByEmail(email);
+        if (accountOpt.isEmpty()) {
+            return null;
+        }
+        
+        Account account = accountOpt.get();
+        if (account.getPasswordHash() == null || !account.getPasswordHash().equals(password)) {
+            return null;
+        }
         
         return account.getId();
     }

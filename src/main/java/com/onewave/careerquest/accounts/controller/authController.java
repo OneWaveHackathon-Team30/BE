@@ -25,7 +25,7 @@ public class authController {
 
     private final authService authService;
     
-    @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임으로 새 계정을 생성합니다.")
+    @Operation(summary = "회원가입", description = "이메일, 비밀번호, 닉네임으로 새 계정을 생성합니다. role을 'COMPANY'로 지정하면 회사 계정이 됩니다.")
     @ApiResponses(value = {
         @ApiResponse(responseCode = "200", description = "회원가입 성공",
             content = @Content(mediaType = "application/json",
@@ -35,19 +35,23 @@ public class authController {
     @PostMapping("/register")
     public ResponseEntity<Map<String, Object>> register(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
-                description = "회원가입 정보",
+                description = "회원가입 정보 (role: USER 또는 COMPANY, 생략 시 USER)",
                 required = true,
                 content = @Content(
                     mediaType = "application/json",
-                    examples = @ExampleObject(value = "{\"email\":\"user@test.com\",\"password\":\"password123\",\"nickname\":\"홍길동\"}")
+                    examples = {
+                        @ExampleObject(name = "일반 사용자", value = "{\"email\":\"user@test.com\",\"password\":\"password123\",\"nickname\":\"홍길동\"}"),
+                        @ExampleObject(name = "회사 계정", value = "{\"email\":\"company@test.com\",\"password\":\"password123\",\"nickname\":\"구글코리아\",\"role\":\"COMPANY\"}")
+                    }
                 )
             )
             @RequestBody Map<String, String> request) {
         String email = request.get("email");
         String password = request.get("password");
         String nickname = request.get("nickname");
+        String role = request.get("role");
         
-        Long userId = authService.register(email, password, nickname);
+        Long userId = authService.register(email, password, nickname, role);
         
         Map<String, Object> response = new HashMap<>();
         response.put("userId", userId);

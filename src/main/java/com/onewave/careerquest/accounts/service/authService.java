@@ -16,6 +16,10 @@ public class authService {
     private final AccountRepository accountRepository;
 
     public Long register(String email, String password, String nickname) {
+        return register(email, password, nickname, null);
+    }
+    
+    public Long register(String email, String password, String nickname, String roleStr) {
         Optional<Account> existing = accountRepository.findByEmail(email);
         if (existing.isPresent()) {
             return existing.get().getId();
@@ -25,12 +29,17 @@ public class authService {
             ? nickname 
             : email.split("@")[0];
         
+        Role role = Role.USER;
+        if (roleStr != null && roleStr.equalsIgnoreCase("COMPANY")) {
+            role = Role.COMPANY;
+        }
+        
         Account newAccount = new Account(
                 email,
                 "uid_" + email,
                 finalNickname,
                 password,
-                Role.USER,
+                role,
                 LocalDateTime.now()
         );
         Account saved = accountRepository.save(newAccount);

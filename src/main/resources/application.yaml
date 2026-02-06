@@ -26,3 +26,6 @@ spring:
 logging:
   level:
     org.hibernate.SQL: debug
+springdoc:
+  swagger-ui:
+    path: /api-test

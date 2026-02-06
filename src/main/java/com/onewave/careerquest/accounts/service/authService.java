@@ -24,18 +24,25 @@ public class authService {
     /**
      * 회원가입
      */
-    public AuthTokens loginOrRegister(String idToken, String nickname) throws FirebaseAuthException {
+    public AuthTokens loginOrRegister(String idToken, String name) throws FirebaseAuthException {
         // 1. Firebase ID Token 검증 및 UID 추출
         FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdToken(idToken);
         String firebaseUid = decodedToken.getUid();
         String firebaseEmail = decodedToken.getEmail();
+        String nickname = "익명";
+        if (name == null || name.isEmpty()) {
+            nickname = firebaseEmail.split("@")[0]; // 이메일 앞부분을 닉네임으로 사용
+        } else {
+            nickname = name;
+        }
 
+        String finalNickname = nickname;
         Account account = accountRepository.findByUid(firebaseUid)
                 .orElseGet(() -> { // 신규 회원가입
                     Account newAccount = new Account(
                             firebaseEmail,
                             firebaseUid,
-                            nickname,
+                            finalNickname,
                             null, // passwordHash는 firebase에서 관리
                             Role.USER,
                             LocalDateTime.now() );

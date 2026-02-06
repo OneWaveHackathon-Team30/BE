@@ -25,9 +25,6 @@ public class SubmissionResponseDto {
     @Schema(description = "제출 일시", example = "2026-02-06T15:30:00")
     private final LocalDateTime submittedAt;
     
-    @Schema(description = "수정 일시", example = "2026-02-06T16:00:00")
-    private final LocalDateTime updatedAt;
-    
     @Schema(description = "채택 여부", example = "false")
     private final Boolean isAdopted;
     
@@ -40,7 +37,6 @@ public class SubmissionResponseDto {
         this.userAccountId = submission.getUserAccount().getId();
         this.content = submission.getContent();
         this.submittedAt = submission.getSubmittedAt();
-        this.updatedAt = submission.getUpdatedAt();
         this.isAdopted = submission.getIsAdopted();
         this.adoptedAt = submission.getAdoptedAt();
     }

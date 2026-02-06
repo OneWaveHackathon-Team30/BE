@@ -25,6 +25,7 @@ import java.util.stream.Collectors;
 public class ScenarioService {
 
     private final ScenarioRepository scenarioRepository;
+    private final AccountRepository accountRepository;
 
     @Transactional
     public ScenarioResponseDto createScenario(ScenarioCreateRequestDto requestDto, Account currentUser) {
@@ -50,15 +51,43 @@ public class ScenarioService {
         return ScenarioResponseDto.from(savedScenario);
     }
 
-    public List<ScenarioResponseDto> getAllScenarios() {
+    public List<ScenarioResponseDto> getAllScenarios(String authorizationHeader) {
+        String uid = extractUidFromHeader(authorizationHeader);
+        Account currentUser = accountRepository.findByUid(uid)
+                .orElseThrow(() -> new UnauthorizedAccessException("Invalid user UID."));
+
         return scenarioRepository.findAllByOrderByCreatedAtDesc().stream()
                 .map(ScenarioResponseDto::from)
                 .collect(Collectors.toList());
     }
 
-    public ScenarioResponseDto getScenarioById(Long id) {
+    public ScenarioResponseDto getScenarioById(Long id, String authorizationHeader) {
         Scenario scenario = scenarioRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Scenario not found with id: " + id));
+
+        // Assuming "Bearer guest" is for guest users or users who are not logged in
+        if (authorizationHeader != null && authorizationHeader.startsWith("Bearer ") && !authorizationHeader.substring(7).equals("guest")) {
+            String uid = extractUidFromHeader(authorizationHeader);
+            Account currentUser = accountRepository.findByUid(uid)
+                    .orElseThrow(() -> new UnauthorizedAccessException("Invalid user UID."));
+
+            // If the user is a company, they can only see their own scenarios
+            if (currentUser.getRole() == Role.COMPANY && !scenario.getCompanyAccount().equals(currentUser)) {
+                throw new UnauthorizedAccessException("You are not authorized to view this scenario.");
+            }
+        } else {
+            // This part handles the logic for guest users.
+            // If you want to prevent guests from seeing any scenarios, you can throw an exception here.
+            // For now, we allow guests to see the scenario.
+        }
+
         return ScenarioResponseDto.from(scenario);
+    }
+
+    private String extractUidFromHeader(String authorizationHeader) {
+        if (authorizationHeader == null || !authorizationHeader.startsWith("Bearer ")) {
+            throw new UnauthorizedAccessException("Authorization header is missing or invalid.");
+        }
+        return authorizationHeader.substring(7);
     }
 }

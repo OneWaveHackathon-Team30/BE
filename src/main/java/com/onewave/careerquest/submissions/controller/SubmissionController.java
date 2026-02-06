@@ -17,7 +17,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@Tag(name = "Submissions", description = "시나리오 제출 관리 API")
+@Tag(name = "제출 (Submissions)", description = "시나리오 제출 관리 API")
 @RestController
 @RequestMapping("/api/scenarios/{scenarioId}/submissions")
 @RequiredArgsConstructor
@@ -25,17 +25,23 @@ public class SubmissionController {
 
     private final SubmissionService submissionService;
 
-    @Operation(summary = "제출 생성", description = "특정 시나리오에 대한 새로운 제출을 생성합니다.")
+    @Operation(summary = "제출 생성", 
+               description = "특정 시나리오에 대한 솔루션을 제출합니다. userAccountId는 로그인 시 받은 userId를 사용하세요.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "201", description = "제출 생성 성공",
                     content = @Content(schema = @Schema(implementation = SubmissionResponseDto.class))),
             @ApiResponse(responseCode = "400", description = "잘못된 요청", content = @Content),
-            @ApiResponse(responseCode = "404", description = "시나리오를 찾을 수 없음", content = @Content)
+            @ApiResponse(responseCode = "404", description = "시나리오 또는 사용자를 찾을 수 없음", content = @Content)
     })
     @PostMapping
     public ResponseEntity<SubmissionResponseDto> createSubmission(
-            @Parameter(description = "시나리오 ID", required = true) @PathVariable Long scenarioId,
-            @io.swagger.v3.oas.annotations.parameters.RequestBody(description = "제출 요청 정보", required = true)
+            @Parameter(description = "시나리오 ID", example = "1", required = true) 
+            @PathVariable Long scenarioId,
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                description = "제출 요청 정보 (userAccountId 필수)", 
+                required = true,
+                content = @Content(schema = @Schema(implementation = SubmissionRequestDto.class))
+            )
             @RequestBody SubmissionRequestDto requestDto) {
         SubmissionResponseDto response = submissionService.createSubmission(scenarioId, requestDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
@@ -49,7 +55,8 @@ public class SubmissionController {
     })
     @GetMapping
     public ResponseEntity<List<SubmissionResponseDto>> getSubmissions(
-            @Parameter(description = "시나리오 ID", required = true) @PathVariable Long scenarioId) {
+            @Parameter(description = "시나리오 ID", example = "1", required = true) 
+            @PathVariable Long scenarioId) {
         List<SubmissionResponseDto> submissions = submissionService.getSubmissionsByScenario(scenarioId);
         return ResponseEntity.ok(submissions);
     }
@@ -62,13 +69,16 @@ public class SubmissionController {
     })
     @GetMapping("/{submissionId}")
     public ResponseEntity<SubmissionResponseDto> getSubmission(
-            @Parameter(description = "시나리오 ID", required = true) @PathVariable Long scenarioId,
-            @Parameter(description = "제출 ID", required = true) @PathVariable Long submissionId) {
+            @Parameter(description = "시나리오 ID", example = "1", required = true) 
+            @PathVariable Long scenarioId,
+            @Parameter(description = "제출 ID", example = "1", required = true) 
+            @PathVariable Long submissionId) {
         SubmissionResponseDto submission = submissionService.getSubmissionById(scenarioId, submissionId);
         return ResponseEntity.ok(submission);
     }
 
-    @Operation(summary = "제출 채택", description = "특정 제출을 채택합니다.")
+    @Operation(summary = "제출 채택", 
+               description = "특정 제출을 채택합니다. 채택된 제출은 해당 시나리오의 우수 솔루션으로 표시됩니다.")
     @ApiResponses(value = {
             @ApiResponse(responseCode = "200", description = "채택 성공",
                     content = @Content(schema = @Schema(implementation = SubmissionResponseDto.class))),
@@ -77,8 +87,10 @@ public class SubmissionController {
     })
     @PostMapping("/{submissionId}/adopt")
     public ResponseEntity<SubmissionResponseDto> adoptSubmission(
-            @Parameter(description = "시나리오 ID", required = true) @PathVariable Long scenarioId,
-            @Parameter(description = "제출 ID", required = true) @PathVariable Long submissionId) {
+            @Parameter(description = "시나리오 ID", example = "1", required = true) 
+            @PathVariable Long scenarioId,
+            @Parameter(description = "제출 ID", example = "1", required = true) 
+            @PathVariable Long submissionId) {
         SubmissionResponseDto submission = submissionService.adoptSubmission(scenarioId, submissionId);
         return ResponseEntity.ok(submission);
     }
@@ -90,8 +102,10 @@ public class SubmissionController {
     })
     @DeleteMapping("/{submissionId}")
     public ResponseEntity<Void> deleteSubmission(
-            @Parameter(description = "시나리오 ID", required = true) @PathVariable Long scenarioId,
-            @Parameter(description = "제출 ID", required = true) @PathVariable Long submissionId) {
+            @Parameter(description = "시나리오 ID", example = "1", required = true) 
+            @PathVariable Long scenarioId,
+            @Parameter(description = "제출 ID", example = "1", required = true) 
+            @PathVariable Long submissionId) {
         submissionService.deleteSubmission(scenarioId, submissionId);
         return ResponseEntity.noContent().build();
     }

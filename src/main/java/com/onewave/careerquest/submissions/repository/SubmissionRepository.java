@@ -9,4 +9,6 @@ import java.util.List;
 @Repository
 public interface SubmissionRepository extends JpaRepository<Submission, Long> {
     List<Submission> findByScenarioId(Long scenarioId);
+    List<Submission> findByUserAccountIdOrderBySubmittedAtDesc(Long userAccountId);
+    List<Submission> findByUserAccountIdAndIsAdoptedTrueOrderByAdoptedAtDesc(Long userAccountId);
 }

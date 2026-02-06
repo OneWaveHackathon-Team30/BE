@@ -9,4 +9,5 @@ import java.util.List;
 @Repository
 public interface ScenarioRepository extends JpaRepository<Scenario, Long> {
     List<Scenario> findAllByOrderByCreatedAtDesc();
+    List<Scenario> findByCompanyAccountIdOrderByCreatedAtDesc(Long companyAccountId);
 }
